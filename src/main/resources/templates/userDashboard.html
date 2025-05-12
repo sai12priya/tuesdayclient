@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory System | User Dashboard</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            background-color: #4b0082; /* Indigo */
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+        }
+        
+        .nav-link.logout {
+            background-color: #008000; /* Green */
+        }
+        
+        .nav-link.logout:hover {
+            background-color: #006400; /* Darker green */
+        }
+        
+        /* Dashboard Content */
+        .dashboard {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .title {
+            font-size: 1.8rem;
+            color: #4b0082; /* Indigo */
+        }
+        
+        .welcome-message {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .product-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-image {
+            height: 180px;
+            background-color: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 1.2rem;
+        }
+        
+        .product-details {
+            padding: 1.5rem;
+        }
+        
+        .product-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .product-vendor {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4b0082; /* Indigo */
+            margin-bottom: 1rem;
+        }
+        
+        .product-stock {
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        
+        .in-stock {
+            color: #008000; /* Green */
+        }
+        
+        .low-stock {
+            color: #ff8c00;
+        }
+        
+        .out-of-stock {
+            color: #cc0000;
+        }
+        
+        .add-to-cart {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #4b0082; /* Indigo */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .add-to-cart:hover {
+            background-color: #3a0068;
+        }
+        
+        .add-to-cart:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        /* Orders Section */
+        .orders-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            color: #4b0082; /* Indigo */
+        }
+        
+        .view-all {
+            color: #008000; /* Green */
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .view-all:hover {
+            text-decoration: underline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f9f9f9;
+            color: #4b0082; /* Indigo */
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status.completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status.shipped {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        
+        /* Cart Section */
+        .cart-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cart-item {
+            display: flex;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        
+        .cart-item-image {
+            width: 80px;
+            height: 80px;
+            background-color: #eee;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+        
+        .cart-item-details {
+            flex: 1;
+        }
+        
+        .cart-item-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .cart-item-vendor {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        
+        .cart-item-price {
+            font-weight: bold;
+            color: #4b0082; /* Indigo */
+        }
+        
+        .cart-item-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            margin-right: 1rem;
+        }
+        
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            background-color: #f5f5f5;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        
+        .quantity-input {
+            width: 40px;
+            height: 30px;
+            text-align: center;
+            border: 1px solid #ddd;
+            margin: 0 0.25rem;
+        }
+        
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #cc0000;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .cart-summary {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+        
+        .summary-label {
+            color: #666;
+        }
+        
+        .summary-value {
+            font-weight: 500;
+        }
+        
+        .total-row {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .checkout-btn {
+            width: 100%;
+            padding: 1rem;
+            background-color: #008000; /* Green */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 1rem;
+            margin-top: 1.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .checkout-btn:hover {
+            background-color: #006400;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                margin-top: 1rem;
+                width: 100%;
+                justify-content: space-between;
+                flex-wrap: wrap;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cart-item {
+                flex-direction: column;
+            }
+            
+            .cart-item-image {
+                width: 100%;
+                height: 120px;
+                margin-bottom: 1rem;
+            }
+            
+            .cart-item-actions {
+                margin-top: 1rem;
+                justify-content: space-between;
+            }
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* No JavaScript fallback */
+        #products-tab:target ~ .dashboard-content #products-content,
+        #orders-tab:target ~ .dashboard-content #orders-content,
+        #cart-tab:target ~ .dashboard-content #cart-content {
+            display: block;
+        }
+        
+        #products-tab:target ~ .dashboard-content #orders-content,
+        #products-tab:target ~ .dashboard-content #cart-content,
+        #orders-tab:target ~ .dashboard-content #products-content,
+        #orders-tab:target ~ .dashboard-content #cart-content,
+        #cart-tab:target ~ .dashboard-content #products-content,
+        #cart-tab:target ~ .dashboard-content #orders-content {
+            display: none;
+        }
+        
+        #products-tab:target ~ .navbar .nav-link[href="#products-tab"],
+        #orders-tab:target ~ .navbar .nav-link[href="#orders-tab"],
+        #cart-tab:target ~ .navbar .nav-link[href="#cart-tab"] {
+            background-color: rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Anchor tags for tab navigation without JavaScript -->
+    <a id="products-tab"></a>
+    <a id="orders-tab"></a>
+    <a id="cart-tab"></a>
+    
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">Inventory Management</div>
+        <div class="nav-links">
+            <a href="#products-tab" class="nav-link active">View All Products</a>
+            <a href="#orders-tab" class="nav-link">Orders</a>
+            <a href="#cart-tab" class="nav-link">Cart (3)</a>
+            <a href="#" class="nav-link logout">Logout</a>
+        </div>
+    </nav>
+    
+    <!-- Dashboard Content -->
+    <div class="dashboard-content">
+        <!-- Products Tab Content -->
+        <div id="products-content" class="tab-content active">
+            <div class="dashboard">
+                <div class="header">
+                    <h1 class="title">Our Products</h1>
+                    <div class="welcome-message">Browse our latest inventory</div>
+                </div>
+                
+                <div class="products-grid">
+                    <div class="product-card">
+                        <div class="product-image">Product Image</div>
+                        <div class="product-details">
+                            <h3 class="product-name">Wireless Headphones</h3>
+                            <div class="product-vendor">By TechGadgets</div>
+                            <div class="product-price">$89.99</div>
+                            <div class="product-stock in-stock">In Stock (25+)</div>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">Product Image</div>
+                        <div class="product-details">
+                            <h3 class="product-name">Ergonomic Keyboard</h3>
+                            <div class="product-vendor">By OfficePro</div>
+                            <div class="product-price">$59.99</div>
+                            <div class="product-stock in-stock">In Stock (15+)</div>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">Product Image</div>
+                        <div class="product-details">
+                            <h3 class="product-name">Bluetooth Speaker</h3>
+                            <div class="product-vendor">By AudioMaster</div>
+                            <div class="product-price">$129.99</div>
+                            <div class="product-stock low-stock">Low Stock (3 left)</div>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">Product Image</div>
+                        <div class="product-details">
+                            <h3 class="product-name">Smart Watch</h3>
+                            <div class="product-vendor">By TechGadgets</div>
+                            <div class="product-price">$199.99</div>
+                            <div class="product-stock in-stock">In Stock (8+)</div>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">Product Image</div>
+                        <div class="product-details">
+                            <h3 class="product-name">Wireless Mouse</h3>
+                            <div class="product-vendor">By OfficePro</div>
+                            <div class="product-price">$29.99</div>
+                            <div class="product-stock in-stock">In Stock (40+)</div>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image">Product Image</div>
+                        <div class="product-details">
+                            <h3 class="product-name">External SSD 1TB</h3>
+                            <div class="product-vendor">By DataTech</div>
+                            <div class="product-price">$149.99</div>
+                            <div class="product-stock out-of-stock">Out of Stock</div>
+                            <button class="add-to-cart" disabled>Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Orders Tab Content -->
+        <div id="orders-content" class="tab-content">
+            <div class="dashboard">
+                <div class="header">
+                    <h1 class="title">Your Orders</h1>
+                    <div class="welcome-message">View your order history</div>
+                </div>
+                
+                <div class="orders-container">
+                    <div class="section-header">
+                        <h2 class="section-title">Recent Orders</h2>
+                        <a href="#" class="view-all">View All Orders</a>
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Date</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#ORD-2023-105</td>
+                                <td>2023-06-15</td>
+                                <td>3</td>
+                                <td>$279.97</td>
+                                <td><span class="status completed">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>#ORD-2023-104</td>
+                                <td>2023-06-10</td>
+                                <td>2</td>
+                                <td>$159.98</td>
+                                <td><span class="status shipped">Shipped</span></td>
+                            </tr>
+                            <tr>
+                                <td>#ORD-2023-103</td>
+                                <td>2023-06-05</td>
+                                <td>1</td>
+                                <td>$89.99</td>
+                                <td><span class="status pending">Processing</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cart Tab Content -->
+        <div id="cart-content" class="tab-content">
+            <div class="dashboard">
+                <div class="header">
+                    <h1 class="title">Your Shopping Cart</h1>
+                    <div class="welcome-message">3 items in your cart</div>
+                </div>
+                
+                <div class="cart-container">
+                    <div class="cart-item">
+                        <div class="cart-item-image">Product Image</div>
+                        <div class="cart-item-details">
+                            <div class="cart-item-name">Wireless Headphones</div>
+                            <div class="cart-item-vendor">TechGadgets</div>
+                            <div class="cart-item-price">$89.99</div>
+                        </div>
+                        <div class="cart-item-actions">
+                            <div class="quantity-control">
+                                <button class="quantity-btn">-</button>
+                                <input type="text" class="quantity-input" value="1">
+                                <button class="quantity-btn">+</button>
+                            </div>
+                            <button class="remove-btn">Remove</button>
+                        </div>
+                    </div>
+                    
+                    <div class="cart-item">
+                        <div class="cart-item-image">Product Image</div>
+                        <div class="cart-item-details">
+                            <div class="cart-item-name">Ergonomic Keyboard</div>
+                            <div class="cart-item-vendor">OfficePro</div>
+                            <div class="cart-item-price">$59.99</div>
+                        </div>
+                        <div class="cart-item-actions">
+                            <div class="quantity-control">
+                                <button class="quantity-btn">-</button>
+                                <input type="text" class="quantity-input" value="1">
+                                <button class="quantity-btn">+</button>
+                            </div>
+                            <button class="remove-btn">Remove</button>
+                        </div>
+                    </div>
+                    
+                    <div class="cart-item">
+                        <div class="cart-item-image">Product Image</div>
+                        <div class="cart-item-details">
+                            <div class="cart-item-name">Bluetooth Speaker</div>
+                            <div class="cart-item-vendor">AudioMaster</div>
+                            <div class="cart-item-price">$129.99</div>
+                        </div>
+                        <div class="cart-item-actions">
+                            <div class="quantity-control">
+                                <button class="quantity-btn">-</button>
+                                <input type="text" class="quantity-input" value="1">
+                                <button class="quantity-btn">+</button>
+                            </div>
+                            <button class="remove-btn">Remove</button>
+                        </div>
+                    </div>
+                    
+                    <div class="cart-summary">
+                        <div class="summary-row">
+                            <span class="summary-label">Subtotal</span>
+                            <span class="summary-value">$279.97</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Shipping</span>
+                            <span class="summary-value">$9.99</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Tax</span>
+                            <span class="summary-value">$22.40</span>
+                        </div>
+                        <div class="summary-row total-row">
+                            <span class="summary-label">Total</span>
+                            <span class="summary-value">$312.36</span>
+                        </div>
+                    
+                        <button class="checkout-btn">Proceed to Checkout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

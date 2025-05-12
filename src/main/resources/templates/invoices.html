@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Management | Admin Dashboard</title>
+    <style>
+        :root {
+            --indigo: #4b0082;
+            --indigo-light: #6a20b4;
+            --green: #2ecc71;
+            --green-dark: #27ae60;
+            --white: #ffffff;
+            --black: #333333;
+            --gray: #f5f5f5;
+            --gray-dark: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f9f9f9;
+            color: var(--black);
+        }
+
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 250px;
+            background-color: var(--indigo);
+            color: var(--white);
+            padding: 20px 0;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-menu {
+            margin-top: 20px;
+        }
+
+        .nav-item {
+            list-style: none;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s;
+            gap: 10px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--indigo-light);
+            border-left: 4px solid var(--green);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: var(--indigo);
+            font-size: 28px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--indigo);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Invoice Management */
+        .invoice-management {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 25px;
+        }
+
+        .invoice-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--gray-dark);
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--black);
+        }
+
+        .tab-btn.active {
+            border-bottom: 3px solid var(--green);
+            color: var(--indigo);
+            font-weight: 600;
+        }
+
+        .invoice-tools {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--gray-dark);
+            border-radius: 5px;
+        }
+
+        .filter-btn, .export-btn {
+            background-color: var(--white);
+            border: 1px solid var(--gray-dark);
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .export-btn {
+            background-color: var(--green);
+            color: var(--white);
+            border: none;
+        }
+
+        .export-btn:hover {
+            background-color: var(--green-dark);
+        }
+
+        /* Invoice Table */
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .invoice-table th {
+            background-color: var(--indigo);
+            color: var(--white);
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .invoice-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--gray-dark);
+        }
+
+        .invoice-table tr:hover {
+            background-color: var(--gray);
+        }
+
+        .invoice-id {
+            color: var(--indigo);
+            font-weight: 500;
+        }
+
+        .invoice-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-paid {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--green-dark);
+        }
+
+        .status-pending {
+            background-color: rgba(241, 196, 15, 0.2);
+            color: #f39c12;
+        }
+
+        .status-overdue {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #c0392b;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .view-btn, .print-btn, .email-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .view-btn {
+            background-color: var(--indigo-light);
+            color: var(--white);
+        }
+
+        .view-btn:hover {
+            background-color: var(--indigo);
+        }
+
+        .print-btn {
+            background-color: var(--gray-dark);
+            color: var(--black);
+        }
+
+        .print-btn:hover {
+            background-color: #d0d0d0;
+        }
+
+        .email-btn {
+            background-color: var(--green);
+            color: var(--white);
+        }
+
+        .email-btn:hover {
+            background-color: var(--green-dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .invoice-tools {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .action-btns {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>InventoryPro</h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="admin_dashboard.html" class="nav-link">
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="inventory.html" class="nav-link">
+                        Inventory
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="products.html" class="nav-link">
+                        Products
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="purchases.html" class="nav-link">
+                        Purchases
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="vendors.html" class="nav-link">
+                        Vendors
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="invoices.html" class="nav-link active">
+                        Invoices
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1>Invoice Management</h1>
+                <div class="user-profile">
+                    <div class="user-avatar">AD</div>
+                    <span>Admin User</span>
+                </div>
+            </div>
+            
+            <div class="invoice-management">
+                <div class="invoice-tabs">
+                    <button class="tab-btn active">Customer Invoices</button>
+                    <button class="tab-btn">Vendor Invoices</button>
+                </div>
+                
+                <div class="invoice-tools">
+                    <div class="search-box">
+                        <input type="text" placeholder="Search invoices...">
+                    </div>
+                    <div>
+                        <button class="filter-btn">Filter</button>
+                        <button class="export-btn">Export</button>
+                    </div>
+                </div>
+                
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>Invoice #</th>
+                            <th>Date</th>
+                            <th>Customer/Vendor</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Due Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Customer Invoice 1 -->
+                        <tr>
+                            <td class="invoice-id">INV-2023-001</td>
+                            <td>2023-06-15</td>
+                            <td>ABC Corporation</td>
+                            <td>$1,245.00</td>
+                            <td><span class="invoice-status status-paid">Paid</span></td>
+                            <td>2023-07-15</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="view-btn">View</button>
+                                    <button class="print-btn">Print</button>
+                                    <button class="email-btn">Email</button>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Customer Invoice 2 -->
+                        <tr>
+                            <td class="invoice-id">INV-2023-002</td>
+                            <td>2023-06-18</td>
+                            <td>XYZ Enterprises</td>
+                            <td>$845.50</td>
+                            <td><span class="invoice-status status-pending">Pending</span></td>
+                            <td>2023-07-18</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="view-btn">View</button>
+                                    <button class="print-btn">Print</button>
+                                    <button class="email-btn">Email</button>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Vendor Invoice 1 -->
+                        <tr>
+                            <td class="invoice-id">VINV-2023-001</td>
+                            <td>2023-06-10</td>
+                            <td>Office Supplies Co.</td>
+                            <td>$320.75</td>
+                            <td><span class="invoice-status status-paid">Paid</span></td>
+                            <td>2023-07-10</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="view-btn">View</button>
+                                    <button class="print-btn">Print</button>
+                                    <button class="email-btn">Email</button>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Customer Invoice 3 -->
+                        <tr>
+                            <td class="invoice-id">INV-2023-003</td>
+                            <td>2023-06-20</td>
+                            <td>Global Tech</td>
+                            <td>$2,150.00</td>
+                            <td><span class="invoice-status status-overdue">Overdue</span></td>
+                            <td>2023-06-30</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="view-btn">View</button>
+                                    <button class="print-btn">Print</button>
+                                    <button class="email-btn">Email</button>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Vendor Invoice 2 -->
+                        <tr>
+                            <td class="invoice-id">VINV-2023-002</td>
+                            <td>2023-06-12</td>
+                            <td>Tech Electronics</td>
+                            <td>$1,575.25</td>
+                            <td><span class="invoice-status status-pending">Pending</span></td>
+                            <td>2023-07-12</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="view-btn">View</button>
+                                    <button class="print-btn">Print</button>
+                                    <button class="email-btn">Email</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

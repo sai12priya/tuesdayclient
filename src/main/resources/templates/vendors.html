@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Management | Admin Dashboard</title>
+    <style>
+        :root {
+            --indigo: #4b0082;
+            --indigo-light: #6a20b4;
+            --green: #2ecc71;
+            --green-dark: #27ae60;
+            --white: #ffffff;
+            --black: #333333;
+            --gray: #f5f5f5;
+            --gray-dark: #e0e0e0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: var(--black);
+        }
+        
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Navigation - Consistent with previous responses */
+        .sidebar {
+            width: 250px;
+            background-color: var(--indigo);
+            color: var(--white);
+            padding: 20px 0;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--white);
+        }
+        
+        .nav-menu {
+            margin-top: 20px;
+        }
+        
+        .nav-item {
+            list-style: none;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s;
+            gap: 10px;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--indigo-light);
+            border-left: 4px solid var(--green);
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            background-color: #f9f9f9;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 30px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: var(--indigo);
+            font-size: 28px;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--indigo);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        /* Vendor Tools */
+        .vendor-tools {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+        
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--gray-dark);
+            border-radius: 5px;
+        }
+        
+        .add-vendor-btn {
+            background-color: var(--green);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .add-vendor-btn:hover {
+            background-color: var(--green-dark);
+        }
+        
+        /* Vendor Table */
+        .vendor-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .vendor-table th {
+            background-color: var(--indigo);
+            color: var(--white);
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        .vendor-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--gray-dark);
+        }
+        
+        .vendor-table tr:hover {
+            background-color: var(--gray);
+        }
+        
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .edit-btn, .delete-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .edit-btn {
+            background-color: var(--indigo-light);
+            color: var(--white);
+        }
+        
+        .edit-btn:hover {
+            background-color: var(--indigo);
+        }
+        
+        .delete-btn {
+            background-color: #e74c3c;
+            color: var(--white);
+        }
+        
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        /* Vendor Status */
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status.active {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--green-dark);
+        }
+        
+        .status.inactive {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #c0392b;
+        }
+        
+        /* Vendor Form */
+        .vendor-form {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .vendor-form h2 {
+            color: var(--indigo);
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--gray-dark);
+            border-radius: 5px;
+        }
+        
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--indigo);
+            box-shadow: 0 0 0 2px rgba(75, 0, 130, 0.2);
+        }
+        
+        .form-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .cancel-btn, .save-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .cancel-btn {
+            background-color: var(--gray-dark);
+            color: var(--black);
+        }
+        
+        .cancel-btn:hover {
+            background-color: #d0d0d0;
+        }
+        
+        .save-btn {
+            background-color: var(--green);
+            color: var(--white);
+        }
+        
+        .save-btn:hover {
+            background-color: var(--green-dark);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                overflow: hidden;
+            }
+            
+            .sidebar-header h2 span, .nav-link span {
+                display: none;
+            }
+            
+            .nav-link {
+                justify-content: center;
+                padding: 12px 10px;
+            }
+            
+            .vendor-tools {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .action-btns {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2><span>InventoryPro</span></h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="admin_dashboard.html" class="nav-link">
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="inventory.html" class="nav-link">
+                        <span>Inventory</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="purchases.html" class="nav-link">
+                        <span>Purchases</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="vendors.html" class="nav-link active">
+                        <span>Vendors</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="reports.html" class="nav-link">
+                        <span>Reports</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="settings.html" class="nav-link">
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1>Vendor Management</h1>
+                <div class="user-profile">
+                    <div class="user-avatar">AD</div>
+                    <span>Admin User</span>
+                </div>
+            </div>
+            
+            <div class="container">
+                <div class="vendor-tools">
+                    <div class="search-box">
+                        <input type="text" placeholder="Search vendors...">
+                    </div>
+                    <button class="add-vendor-btn" onclick="document.getElementById('vendorForm').style.display='block'">
+                        Add Vendor
+                    </button>
+                </div>
+                
+                <!-- Vendor Form (Hidden by default) -->
+                <div class="vendor-form" id="vendorForm">
+                    <h2>Add New Vendor</h2>
+                    <form>
+                        <div class="form-group">
+                            <label for="vendorName">Vendor Name</label>
+                            <input type="text" id="vendorName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="companyName">Company Name</label>
+                            <input type="text" id="companyName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="tel" id="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productType">Product Type</label>
+                            <select id="productType" required>
+                                <option value="">Select product type</option>
+                                <option value="Office Supplies">Office Supplies</option>
+                                <option value="Electronics">Electronics</option>
+                                <option value="Furniture">Furniture</option>
+                                <option value="Tech Equipment">Tech Equipment</option>
+                                <option value="Maintenance">Maintenance</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <textarea id="address" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select id="status" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-footer">
+                            <button type="button" class="cancel-btn" onclick="document.getElementById('vendorForm').style.display='none'">Cancel</button>
+                            <button type="submit" class="save-btn">Save Vendor</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <table class="vendor-table">
+                    <thead>
+                        <tr>
+                            <th>Vendor Name</th>
+                            <th>Contact</th>
+                            <th>Product Type</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <strong>John Doe</strong>
+                                <div style="font-size: 13px; color: #666;">Office Supplies Co.</div>
+                            </td>
+                            <td>
+                                john@officesupplies.com<br>
+                                (555) 123-4567
+                            </td>
+                            <td>Office Supplies</td>
+                            <td><span class="status active">Active</span></td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="edit-btn">Edit</button>
+                                    <button class="delete-btn">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Sarah Miller</strong>
+                                <div style="font-size: 13px; color: #666;">Tech Electronics</div>
+                            </td>
+                            <td>
+                                sarah@techelectronics.com<br>
+                                (555) 987-6543
+                            </td>
+                            <td>Electronics</td>
+                            <td><span class="status active">Active</span></td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="edit-btn">Edit</button>
+                                    <button class="delete-btn">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Robert Johnson</strong>
+                                <div style="font-size: 13px; color: #666;">Furniture World</div>
+                            </td>
+                            <td>
+                                robert@furnitureworld.com<br>
+                                (555) 456-7890
+                            </td>
+                            <td>Furniture</td>
+                            <td><span class="status inactive">Inactive</span></td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="edit-btn">Edit</button>
+                                    <button class="delete-btn">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Alice Williams</strong>
+                                <div style="font-size: 13px; color: #666;">Tech Equipment Inc.</div>
+                            </td>
+                            <td>
+                                alice@techequip.com<br>
+                                (555) 789-0123
+                            </td>
+                            <td>Tech Equipment</td>
+                            <td><span class="status active">Active</span></td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="edit-btn">Edit</button>
+                                    <button class="delete-btn">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Thomas Brown</strong>
+                                <div style="font-size: 13px; color: #666;">Maintenance Solutions</div>
+                            </td>
+                            <td>
+                                thomas@maint.com<br>
+                                (555) 234-5678
+                            </td>
+                            <td>Maintenance</td>
+                            <td><span class="status active">Active</span></td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="edit-btn">Edit</button>
+                                    <button class="delete-btn">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

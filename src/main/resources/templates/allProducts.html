@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Products | Admin Dashboard</title>
+    <style>
+        :root {
+            --indigo: #4b0082;
+            --indigo-light: #6a20b4;
+            --green: #2ecc71;
+            --green-dark: #27ae60;
+            --white: #ffffff;
+            --black: #333333;
+            --gray: #f5f5f5;
+            --gray-dark: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f9f9f9;
+            color: var(--black);
+        }
+
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 250px;
+            background-color: var(--indigo);
+            color: var(--white);
+            padding: 20px 0;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-menu {
+            margin-top: 20px;
+        }
+
+        .nav-item {
+            list-style: none;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s;
+            gap: 10px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--indigo-light);
+            border-left: 4px solid var(--green);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: var(--indigo);
+            font-size: 28px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--indigo);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Product Management */
+        .product-management {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 25px;
+        }
+
+        .product-tools {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--gray-dark);
+            border-radius: 5px;
+        }
+
+        .filter-btn {
+            background-color: var(--white);
+            border: 1px solid var(--gray-dark);
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-product-btn {
+            background-color: var(--green);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .add-product-btn:hover {
+            background-color: var(--green-dark);
+        }
+
+        /* Product Cards */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s;
+            border: 1px solid var(--gray-dark);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .product-image {
+            height: 180px;
+            background-color: var(--gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--indigo);
+            font-weight: bold;
+            position: relative;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--green);
+            color: var(--white);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .product-details {
+            padding: 15px;
+        }
+
+        .product-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--indigo);
+        }
+
+        .product-category {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .product-price {
+            font-weight: 600;
+            color: var(--green-dark);
+        }
+
+        .product-stock {
+            font-size: 14px;
+        }
+
+        .in-stock {
+            color: var(--green-dark);
+        }
+
+        .low-stock {
+            color: orange;
+        }
+
+        .out-of-stock {
+            color: #e74c3c;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid var(--gray-dark);
+            padding-top: 15px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .edit-btn {
+            background-color: var(--indigo-light);
+            color: var(--white);
+        }
+
+        .edit-btn:hover {
+            background-color: var(--indigo);
+        }
+
+        .delete-btn {
+            background-color: #e74c3c;
+            color: var(--white);
+        }
+
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .product-tools {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>InventoryPro</h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="admin_dashboard.html" class="nav-link">
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="inventory.html" class="nav-link">
+                        Inventory
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="products.html" class="nav-link active">
+                        All Products
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="purchases.html" class="nav-link">
+                        Purchases
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="vendors.html" class="nav-link">
+                        Vendors
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="reports.html" class="nav-link">
+                        Reports
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1>All Products</h1>
+                <div class="user-profile">
+                    <div class="user-avatar">AD</div>
+                    <span>Admin User</span>
+                </div>
+            </div>
+            
+            <div class="product-management">
+                <div class="product-tools">
+                    <div class="search-box">
+                        <input type="text" placeholder="Search products...">
+                    </div>
+                    <div>
+                        <button class="filter-btn">Filter</button>
+                        <button class="add-product-btn">Add Product</button>
+                    </div>
+                </div>
+                
+                <div class="product-grid">
+                    <!-- Product Card 1 -->
+                    <div class="product-card">
+                        <div class="product-image">
+                            <span>Product Image</span>
+                            <span class="product-badge">New</span>
+                        </div>
+                        <div class="product-details">
+                            <h3 class="product-title">Wireless Keyboard</h3>
+                            <div class="product-category">Electronics</div>
+                            <div class="product-meta">
+                                <span class="product-price">$49.99</span>
+                                <span class="product-stock in-stock">In Stock (45)</span>
+                            </div>
+                            <div class="product-actions">
+                                <button class="action-btn edit-btn">Edit</button>
+                                <button class="action-btn delete-btn">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product Card 2 -->
+                    <div class="product-card">
+                        <div class="product-image">
+                            <span>Product Image</span>
+                        </div>
+                        <div class="product-details">
+                            <h3 class="product-title">Office Chair</h3>
+                            <div class="product-category">Furniture</div>
+                            <div class="product-meta">
+                                <span class="product-price">$129.99</span>
+                                <span class="product-stock low-stock">Low Stock (3)</span>
+                            </div>
+                            <div class="product-actions">
+                                <button class="action-btn edit-btn">Edit</button>
+                                <button class="action-btn delete-btn">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product Card 3 -->
+                    <div class="product-card">
+                        <div class="product-image">
+                            <span>Product Image</span>
+                            <span class="product-badge">Sale</span>
+                        </div>
+                        <div class="product-details">
+                            <h3 class="product-title">Notebook Set</h3>
+                            <div class="product-category">Office Supplies</div>
+                            <div class="product-meta">
+                                <span class="product-price">$12.99</span>
+                                <span class="product-stock in-stock">In Stock (120)</span>
+                            </div>
+                            <div class="product-actions">
+                                <button class="action-btn edit-btn">Edit</button>
+                                <button class="action-btn delete-btn">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product Card 4 -->
+                    <div class="product-card">
+                        <div class="product-image">
+                            <span>Product Image</span>
+                        </div>
+                        <div class="product-details">
+                            <h3 class="product-title">Monitor 24"</h3>
+                            <div class="product-category">Electronics</div>
+                            <div class="product-meta">
+                                <span class="product-price">$179.99</span>
+                                <span class="product-stock out-of-stock">Out of Stock</span>
+                            </div>
+                            <div class="product-actions">
+                                <button class="action-btn edit-btn">Edit</button>
+                                <button class="action-btn delete-btn">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product Card 5 -->
+                    <div class="product-card">
+                        <div class="product-image">
+                            <span>Product Image</span>
+                        </div>
+                        <div class="product-details">
+                            <h3 class="product-title">Desk Organizer</h3>
+                            <div class="product-category">Office Supplies</div>
+                            <div class="product-meta">
+                                <span class="product-price">$24.99</span>
+                                <span class="product-stock in-stock">In Stock (32)</span>
+                            </div>
+                            <div class="product-actions">
+                                <button class="action-btn edit-btn">Edit</button>
+                                <button class="action-btn delete-btn">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product Card 6 -->
+                    <div class="product-card">
+                        <div class="product-image">
+                            <span>Product Image</span>
+                            <span class="product-badge">New</span>
+                        </div>
+                        <div class="product-details">
+                            <h3 class="product-title">Wireless Mouse</h3>
+                            <div class="product-category">Electronics</div>
+                            <div class="product-meta">
+                                <span class="product-price">$29.99</span>
+                                <span class="product-stock in-stock">In Stock (68)</span>
+                            </div>
+                            <div class="product-actions">
+                                <button class="action-btn edit-btn">Edit</button>
+                                <button class="action-btn delete-btn">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

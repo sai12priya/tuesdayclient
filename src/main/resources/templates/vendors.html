@@ -342,35 +342,31 @@
             </div>
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a href="admin_dashboard.html" class="nav-link">
+                    <a href="admin_dashboard.html" class="nav-link active">
                         <span>Dashboard</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a href="inventory.html" class="nav-link">
-                        <span>Inventory</span>
+                        <span>Make Purchase</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a href="purchases.html" class="nav-link">
-                        <span>Purchases</span>
+                        <span>Invoices</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="vendors.html" class="nav-link active">
+                    <a href="vendors.html" class="nav-link ">
                         <span>Vendors</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="reports.html" class="nav-link">
-                        <span>Reports</span>
+                    <a href="vendors.html" class="nav-link ">
+                        <span>All Products</span>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="settings.html" class="nav-link">
-                        <span>Settings</span>
-                    </a>
-                </li>
+                
             </ul>
         </div>
         
@@ -397,41 +393,35 @@
                 <!-- Vendor Form (Hidden by default) -->
                 <div class="vendor-form" id="vendorForm">
                     <h2>Add New Vendor</h2>
-                    <form>
+                    <form method="post" action="/vendor/add">
                         <div class="form-group">
                             <label for="vendorName">Vendor Name</label>
-                            <input type="text" id="vendorName" required>
+                            <input type="text" id="vendorName" name="vendorName" required>
                         </div>
                         <div class="form-group">
                             <label for="companyName">Company Name</label>
-                            <input type="text" id="companyName" required>
+                            <input type="text" id="companyName" name="companyName" required>
                         </div>
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input type="email" id="email" required>
+                            <input type="email" id="email" name="email" required>
                         </div>
                         <div class="form-group">
                             <label for="phone">Phone</label>
-                            <input type="tel" id="phone" required>
+                            <input type="tel" id="phone" name="phone" required>
                         </div>
                         <div class="form-group">
-                            <label for="productType">Product Type</label>
-                            <select id="productType" required>
-                                <option value="">Select product type</option>
-                                <option value="Office Supplies">Office Supplies</option>
-                                <option value="Electronics">Electronics</option>
-                                <option value="Furniture">Furniture</option>
-                                <option value="Tech Equipment">Tech Equipment</option>
-                                <option value="Maintenance">Maintenance</option>
-                            </select>
+                            <label for="productName">Product Name</label>
+                            <input type="text" id="productName"  name="productName" required>
                         </div>
+                        
                         <div class="form-group">
                             <label for="address">Address</label>
-                            <textarea id="address" rows="3"></textarea>
+                            <textarea id="address" rows="3" name="address"></textarea>
                         </div>
                         <div class="form-group">
                             <label for="status">Status</label>
-                            <select id="status" required>
+                            <select id="status" name="status" required>
                                 <option value="active">Active</option>
                                 <option value="inactive">Inactive</option>
                             </select>
@@ -449,7 +439,7 @@
                         <tr>
                             <th>Vendor Name</th>
                             <th>Contact</th>
-                            <th>Product Type</th>
+                            <th>Product Name</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>

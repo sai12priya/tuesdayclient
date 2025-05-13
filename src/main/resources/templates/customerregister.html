@@ -151,7 +151,9 @@
 			<button type="submit" class="login-button">Register</button>
 
 		</form>
-		<p th:text="${error}"></p>
+		<div th:if="${error}" class="alert alert-danger" role="alert">
+        <span th:text="${error}"></span>
+    </div>
 
 	</div>
 

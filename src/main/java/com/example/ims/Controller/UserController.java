@@ -21,6 +21,10 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.ims.Entity.User;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/user")
@@ -34,50 +38,154 @@ public class UserController {
         return "customerregister";
     }
 
+    
+
 	@PostMapping("/register")
-    public String processCustomerRegister(@ModelAttribute("user") User user,
-            @RequestParam String confirmPassword,
-            Model model) {
-		// Client-side validation
-        if (!user.getPassword().equals(confirmPassword)) {
-            model.addAttribute("error", "Passwords do not match");
-            return "customerregister";
-        }
-
-        String serviceUrl = "http://localhost:8002/user/register";
-        user.setRole("USER"); // Ensure role is set
-
+    public String processRegisterUser(@ModelAttribute("user") User user,
+                             @RequestParam("confirmpassword") String confirmpassword,
+                             Model model) {
+        
         try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            // Create request with both password and confirmPassword
+            // Prepare request
             Map<String, String> requestBody = new HashMap<>();
             requestBody.put("username", user.getUsername());
             requestBody.put("password", user.getPassword());
-            requestBody.put("confirmPassword", confirmPassword);
-
-            ResponseEntity<String> response = restTemplate.exchange(
+            requestBody.put("confirmpassword", confirmpassword);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            
+            String serviceUrl = "http://localhost:8002/user/register";
+            
+            // Make API call
+            ResponseEntity<Map> response = restTemplate.exchange(
                 serviceUrl,
                 HttpMethod.POST,
                 new HttpEntity<>(requestBody, headers),
-                String.class
+                Map.class
             );
-
-            return "redirect:/user/login"; // Redirect to login page on success
-
+            
+            // If successful, redirect to login
+            return "redirect:/user/login";
+            
         } catch (HttpClientErrorException e) {
-            if (e.getStatusCode() == HttpStatus.CONFLICT) {
-                model.addAttribute("error", "Username already exists");
+            // Handle API errors
+            if (e.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                // Parse the error message from the response
+                String errorMessage = "Registration failed";
+                try {
+                    // Assuming the error response is in JSON format
+                    Map<String, String> errorResponse = e.getResponseBodyAs(Map.class);
+                    if (errorResponse != null && errorResponse.containsKey("message")) {
+                        errorMessage = errorResponse.get("message");
+                    }
+                } catch (Exception ex) {
+                    // Fallback if parsing fails
+                    errorMessage = e.getResponseBodyAsString();
+                }
+                model.addAttribute("error", errorMessage);
             } else {
-                model.addAttribute("error", "Registration failed: " + e.getStatusText());
+                model.addAttribute("error", "Registration failed. Please try again later.");
             }
         } catch (Exception e) {
             model.addAttribute("error", "Service unavailable. Please try again later.");
         }
+        
+        return "customerregister";
+    }
+	
+	@GetMapping("/login")
+    public String showUserLoginPage(Model model) {
+    	 model.addAttribute("error", null);
+        return "customerlogin";
+    }
+	
+	
+	
+	@PostMapping("/login")
+	public String processUserLogin(
+		    @RequestParam String username,
+		    @RequestParam String password,
+		    Model model,
+		    HttpSession session
+		) {
+		    
 
-        return "customerregister";// Return to login page with error message
-	}
+		    try {
+		        // Prepare request
+		        Map<String, String> requestBody = new HashMap<>();
+		        requestBody.put("username", username);
+		        requestBody.put("password", password);
+		        
+		        HttpHeaders headers = new HttpHeaders();
+		        headers.setContentType(MediaType.APPLICATION_JSON);
+		        String serviceUrl = "http://localhost:8002/user/login";
+		        
+		        // Make API call
+		        ResponseEntity<Map> response = restTemplate.exchange(
+		            serviceUrl,
+		            HttpMethod.POST,
+		            new HttpEntity<>(requestBody, headers),
+		            Map.class
+		        );
+		        
+		        // Store user info in session
+		        session.setAttribute("username", username);
+		        session.setAttribute("role", response.getBody().get("role"));
+		        
+		        return "redirect:/user/dashboard";
+		        
+		    } catch (HttpClientErrorException e) {
+		        String errorMessage = "Login failed";
+		        
+		        try {
+		            // Parse the error response
+		            ObjectMapper mapper = new ObjectMapper();
+		            Map<String, String> errorResponse = mapper.readValue(
+		                e.getResponseBodyAsString(),
+		                new TypeReference<Map<String, String>>() {}
+		            );
+		            
+		            if (errorResponse != null && errorResponse.containsKey("message")) {
+		                errorMessage = errorResponse.get("message");
+		                
+		                // Map specific error messages
+		                switch (errorMessage) {
+		                    case "User not found":
+		                        errorMessage = "Username not found. Please check your username";
+		                        break;
+		                    case "Invalid password":
+		                        errorMessage = "Incorrect password. Please try again";
+		                        break;
+		                    case "Access denied. Customer account required":
+		                        errorMessage = "This account is not authorized for customer access";
+		                        break;
+		                }
+		            }
+		        } catch (Exception ex) {
+		            // Fallback based on HTTP status code
+		            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+		                errorMessage = "Username not found. Please check your username";
+		            } else if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+		                errorMessage = "Incorrect password. Please try again";
+		            } else if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
+		                errorMessage = "This account is not authorized for customer access";
+		            }
+		        }
+		        
+		        model.addAttribute("error", errorMessage);
+		    } catch (Exception e) {
+		        model.addAttribute("error", "Service unavailable. Please try again later.");
+		    }
+		    
+		    return "customerlogin";
+		}
+	
+	@GetMapping("/dashboard")
+    public String showUserDashboard(Model model) {
+    	 model.addAttribute("error", null);
+        return "userDashboard";
+    }
 	
 
 }
